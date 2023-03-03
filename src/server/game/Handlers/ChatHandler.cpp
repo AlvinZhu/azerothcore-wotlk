@@ -406,13 +406,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (!senderIsPlayer && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID()))
                     sender->AddWhisperWhiteList(receiver->GetGUID());
 
-                if (!sScriptMgr->CanPlayerUseChat(GetPlayer(), type, lang, msg, receiver))
-                {
-                    return;
-                }
-
-                sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, receiver);
-
                 GetPlayer()->Whisper(msg, Language(lang), receiver);
             }
             break;
@@ -457,10 +450,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                         sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, guild);
 
                         guild->BroadcastToGuild(this, false, msg, lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
-                    }
-                    else
-                    {
-                        sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg);
                     }
                 }
             }

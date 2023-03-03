@@ -13,9 +13,6 @@
 [submodule "modules/mod-eluna"]
 	path = modules/mod-eluna
 	url = https://github.com/azerothcore/mod-eluna.git
-[submodule "modules/mod-playerbots"]
-	path = modules/mod-playerbots
-	url = git@github.com:AlvinZhu/mod-playerbots.git
 [submodule "modules/mod-anticheat"]
 	path = modules/mod-anticheat
 	url = git@github.com:AlvinZhu/mod-anticheat.git

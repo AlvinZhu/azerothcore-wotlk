@@ -192,7 +192,6 @@ public:
      * @return True if you want to continue receive the packet, false if you want to disallow receive the packet
      */
     [[nodiscard]] virtual bool CanPacketReceive(WorldSession* /*session*/, WorldPacket& /*packet*/) { return true; }
-    virtual void OnPacketReceived(WorldSession* /*session*/, WorldPacket const& /*packet*/) { }
 };
 
 class WorldScript : public ScriptObject
@@ -1030,7 +1029,6 @@ public:
     // Called for player::update
     virtual void OnBeforeUpdate(Player* /*player*/, uint32 /*p_time*/) { }
     virtual void OnUpdate(Player* /*player*/, uint32 /*p_time*/) { }
-    virtual void OnAfterUpdate(Player* /*player*/, uint32 /*diff*/) {}
 
     // Called when a player's money is modified (before the modification is done)
     virtual void OnMoneyChanged(Player* /*player*/, int32& /*amount*/) { }
@@ -1952,13 +1950,7 @@ public:
 
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
-    [[nodiscard]] virtual bool OnDatabasesLoading() { return true; }
     virtual void OnAfterDatabasesLoaded(uint32 /*updateFlags*/) { }
-    virtual void OnDatabasesKeepAlive() { }
-    virtual void OnDatabasesClosing() { }
-    virtual void OnDatabaseWarnAboutSyncQueries(bool /*apply*/) { }
-    virtual void OnDatabaseSelectIndexLogout(Player* /*player*/, uint32& /*statementIndex*/, uint32& /*statementParam*/) { }
-    virtual void OnDatabaseGetDBRevision(std::string& /*revision*/) { }
 };
 
 class WorldObjectScript : public ScriptObject
@@ -2047,37 +2039,6 @@ public:
     [[nodiscard]] virtual bool CanAreaTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) { return false; }
 };
 
-class MetricScript : public ScriptObject
-{
-protected:
-    MetricScript(const char* name);
-
-public:
-    bool IsDatabaseBound() const { return false; }
-
-    virtual void OnMetricLogging() { }
-};
-
-class PlayerbotScript : public ScriptObject
-{
-protected:
-
-    PlayerbotScript(const char* name);
-
-public:
-    bool IsDatabaseBound() const { return false; }
-
-    [[nodiscard]] virtual bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& /*guidsList*/) { return true; }
-    virtual void OnPlayerbotCheckKillTask(Player* /*player*/, Unit* /*victim*/) { }
-    virtual void OnPlayerbotCheckPetitionAccount(Player* /*player*/, bool& /*found*/) { }
-    [[nodiscard]] virtual bool OnPlayerbotCheckUpdatesToSend(Player* /*player*/) { return true; }
-    virtual void OnPlayerbotPacketSent(Player* /*player*/, WorldPacket const* /*packet*/) { }
-    virtual void OnPlayerbotUpdate(uint32 /*diff*/) { }
-    virtual void OnPlayerbotUpdateSessions(Player* /*player*/) { }
-    virtual void OnPlayerbotLogout(Player* /*player*/) { }
-    virtual void OnPlayerbotLogoutBots() { }
-};
-
 // Manages registration, loading, and execution of scripts.
 class ScriptMgr
 {
@@ -2130,7 +2091,6 @@ public: /* ServerScript */
     void OnSocketOpen(std::shared_ptr<WorldSocket> socket);
     void OnSocketClose(std::shared_ptr<WorldSocket> socket);
     bool CanPacketReceive(WorldSession* session, WorldPacket const& packet);
-    void OnPacketReceived(WorldSession* session, WorldPacket const& packet);
     bool CanPacketSend(WorldSession* session, WorldPacket const& packet);
 
 public: /* WorldScript */
@@ -2267,7 +2227,6 @@ public: /* AchievementCriteriaScript */
 public: /* PlayerScript */
     void OnBeforePlayerUpdate(Player* player, uint32 p_time);
     void OnPlayerUpdate(Player* player, uint32 p_time);
-    void OnAfterPlayerUpdate(Player* player, uint32 diff);
     void OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data);
     void OnPlayerReleasedGhost(Player* player);
     void OnPVPKill(Player* killer, Player* killed);
@@ -2625,13 +2584,7 @@ public: /* CommandSC */
 
 public: /* DatabaseScript */
 
-    bool OnDatabasesLoading();
     void OnAfterDatabasesLoaded(uint32 updateFlags);
-    void OnDatabasesKeepAlive();
-    void OnDatabasesClosing();
-    void OnDatabaseWarnAboutSyncQueries(bool apply);
-    void OnDatabaseSelectIndexLogout(Player* player, uint32& statementIndex, uint32& statementParam);
-    void OnDatabaseGetDBRevision(std::string& revision);
 
 public: /* WorldObjectScript */
 
@@ -2648,21 +2601,6 @@ public: /* PetScript */
 public: /* LootScript */
 
     void OnLootMoney(Player* player, uint32 gold);
-
-public: /* MetricScript */
-
-    void OnMetricLogging();
-
-public: /* PlayerbotScript */
-    bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& guidsList);
-    void OnPlayerbotCheckKillTask(Player* player, Unit* victim);
-    void OnPlayerbotCheckPetitionAccount(Player* player, bool& found);
-    bool OnPlayerbotCheckUpdatesToSend(Player* player);
-    void OnPlayerbotPacketSent(Player* player, WorldPacket const* packet);
-    void OnPlayerbotUpdate(uint32 diff);
-    void OnPlayerbotUpdateSessions(Player* player);
-    void OnPlayerbotLogout(Player* player);
-    void OnPlayerbotLogoutBots();
 
 private:
     uint32 _scriptCount;

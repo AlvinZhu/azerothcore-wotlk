@@ -424,13 +424,10 @@ void Player::Update(uint32 p_time)
         m_delayed_unit_relocation_timer = 0;
         RemoveFromNotify(NOTIFY_VISIBILITY_CHANGED);
     }
-
     //NpcBot mod: Update
     if (_botMgr)
         _botMgr->Update(p_time);
     //end Npcbot
-
-    sScriptMgr->OnAfterPlayerUpdate(this, p_time);
 }
 
 void Player::UpdateMirrorTimers()

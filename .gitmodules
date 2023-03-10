@@ -40,3 +40,6 @@
 [submodule "modules/mod-synthesize-trainer"]
 	path = modules/mod-synthesize-trainer
 	url = git@github.com:AlvinZhu/mod-synthesize-trainer.git
+[submodule "modules/mod-pbot"]
+	path = modules/mod-pbot
+	url = git@github.com:AlvinZhu/mod-pbot.git

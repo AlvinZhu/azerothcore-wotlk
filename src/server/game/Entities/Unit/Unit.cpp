@@ -1338,7 +1338,7 @@ SpellCastResult Unit::CastCustomSpell(uint32 spellId, CustomSpellValues const& v
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
     {
-        LOG_ERROR("entities.unit", "CastSpell: unknown spell {} by caster {}", spellId, GetGUID().ToString());
+        // LOG_ERROR("entities.unit", "CastSpell: unknown spell {} by caster {}", spellId, GetGUID().ToString());
         return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
 
@@ -3842,13 +3842,15 @@ float Unit::GetUnitParryChance() const
     {
         if (ToCreature()->isWorldBoss())
             chance = 13.4f; // + 0.6 by skill diff
-        else if (GetCreatureType() == CREATURE_TYPE_HUMANOID)
+        else if (GetCreatureType() == CREATURE_TYPE_HUMANOID) {
             //npcbot - custom parry chance instead of bunch of auras
-            if (IsNPCBot())
+            if (IsNPCBot()) {
                 chance = ToCreature()->GetCreatureParryChance();
-            else
-            //end npcbot
-            chance = 5.0f;
+            } else {
+                //end npcbot
+                chance = 5.0f;
+            }
+        }
 
         // Xinef: if aura is present, type should not matter
         chance += GetTotalAuraModifier(SPELL_AURA_MOD_PARRY_PERCENT);
@@ -11252,11 +11254,6 @@ void Unit::SetMinion(Minion* minion, bool apply)
         // PvP, FFAPvP
         minion->SetByteValue(UNIT_FIELD_BYTES_2, 1, GetByteValue(UNIT_FIELD_BYTES_2, 1));
 
-        // FIXME: hack, speed must be set only at follow
-        if (GetTypeId() == TYPEID_PLAYER && minion->IsPet())
-            for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
-                minion->SetSpeed(UnitMoveType(i), m_speed_rate[i], true);
-
         // Ghoul pets have energy instead of mana (is anywhere better place for this code?)
         if (minion->IsPetGhoul() || minion->GetEntry() == 24207 /*ENTRY_ARMY_OF_THE_DEAD*/)
             minion->setPowerType(POWER_ENERGY);
@@ -14502,7 +14499,7 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
 
     //npcbot: CvC case fix for bots
     if (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && !target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) &&
-        (IsNPCBotOrPet() || target->IsNPCBotOrPet()))
+        ((IsNPCBotOrPet() && !ToCreature()->IsFreeBot()) || (target->IsNPCBotOrPet() && !target->ToCreature()->IsFreeBot())))
         return GetReactionTo(target) <= REP_NEUTRAL || target->GetReactionTo(this) <= REP_NEUTRAL;
     //end npcbot
 
@@ -14932,7 +14929,17 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
         {
             // Set creature speed rate
             if (GetTypeId() == TYPEID_UNIT)
-                speed *= ToCreature()->GetCreatureTemplate()->speed_run; // at this point, MOVE_WALK is never reached
+            {
+                if (IsPet() && ToPet()->isControlled() && IsControlledByPlayer())
+                {
+                    // contant value for player pets
+                    speed *= 1.15f;
+                }
+                else
+                {
+                    speed *= ToCreature()->GetCreatureTemplate()->speed_run; // at this point, MOVE_WALK is never reached
+                }
+            }
 
             // Normalize speed by 191 aura SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED if need
             /// @todo possible affect only on MOVE_RUN
@@ -16108,7 +16115,7 @@ void Unit::SetHealth(uint32 val)
     SetUInt32Value(UNIT_FIELD_HEALTH, val);
 
     // mobs that are now or were below 30% need to update their speed
-    if (GetTypeId() == TYPEID_UNIT && (prevHealthPct < 30.0 || HealthBelowPct(30)))
+    if (GetTypeId() == TYPEID_UNIT && !(IsPet() && ToPet()->isControlled() && IsControlledByPlayer()) && (prevHealthPct < 30.0 || HealthBelowPct(30)))
     {
         UpdateSpeed(MOVE_RUN, false);
     }
@@ -16616,7 +16623,10 @@ bool CharmInfo::AddSpellToActionBar(SpellInfo const* spellInfo, ActiveStates new
                         {
                             WorldPacket data;
                             creature->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, spell_id, cooldown);
-                            creature->GetCharmer()->ToPlayer()->SendDirectMessage(&data);
+                            if (creature->GetCharmer() && creature->GetCharmer()->IsPlayer())
+                            {
+                                creature->GetCharmer()->ToPlayer()->SendDirectMessage(&data);
+                            }
                         }
                     }, 500ms);
                 }

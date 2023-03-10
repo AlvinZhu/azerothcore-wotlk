@@ -22,7 +22,6 @@
 #include "ScriptedCreature.h"
 #include "trial_of_the_crusader.h"
 
-#define CLEANUP_CHECK_INTERVAL  5000
 std::map<uint32, bool> validDedicatedInsanityItems;
 
 class instance_trial_of_the_crusader : public InstanceMapScript
@@ -575,7 +574,7 @@ public:
                         {
                             InstanceCleanup();
                         }
-                        events.RepeatEvent(CLEANUP_CHECK_INTERVAL);
+                        events.Repeat(5s);
                     }
                     break;
                 case EVENT_OPEN_GATE:
@@ -1348,7 +1347,7 @@ public:
                         {
                             c->AI()->Talk(SAY_STAGE_4_06);
                             c->SummonCreature(NPC_ARGENT_MAGE, Locs[LOC_MAGE].GetPositionX(), Locs[LOC_MAGE].GetPositionY(), Locs[LOC_MAGE].GetPositionZ(), Locs[LOC_MAGE].GetOrientation());
-                            c->SummonGameObject(195682, 668.15f, 134.57f, 142.12f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 630000000);
+                            //c->SummonGameObject(195682, 668.15f, 134.57f, 142.12f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 630000000);
                         }
 
                         events.RescheduleEvent(EVENT_SCENE_502, 20000);
@@ -1415,7 +1414,7 @@ public:
             // if missing spawn anub'arak
             SpawnAnubArak();
 
-            events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
+            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
         }
 
         bool DoNeedCleanup(Player* ignoredPlayer = nullptr)
@@ -1590,7 +1589,7 @@ public:
             Counter = 0;
             EncounterStatus = NOT_STARTED;
             events.Reset();
-            events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
+            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
         }
 
         void ReadSaveDataMore(std::istringstream& data) override

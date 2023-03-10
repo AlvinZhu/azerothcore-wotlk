@@ -33,6 +33,10 @@ Player NpcBots management
 TODO: Move creature hooks here
 */
 
+#ifdef _MSC_VER
+# pragma warning(push, 4)
+#endif
+
 //config
 uint8 _basefollowdist;
 uint8 _maxNpcBots;
@@ -50,6 +54,7 @@ uint32 _npcBotUpdateDelayBase;
 uint32 _npcBotEngageDelayDPS_default;
 uint32 _npcBotEngageDelayHeal_default;
 uint32 _npcBotOwnerExpireTime;
+uint32 _desiredWanderingBotsCount;
 bool _enableNpcBots;
 bool _enableNpcBotsDungeons;
 bool _enableNpcBotsRaids;
@@ -267,6 +272,7 @@ void BotMgr::LoadConfig(bool reload)
     _npcBotEngageDelayDPS_default   = sConfigMgr->GetIntDefault("NpcBot.EngageDelay.DPS", 0);
     _npcBotEngageDelayHeal_default  = sConfigMgr->GetIntDefault("NpcBot.EngageDelay.Heal", 0);
     _npcBotOwnerExpireTime          = sConfigMgr->GetIntDefault("NpcBot.OwnershipExpireTime", 0);
+    _desiredWanderingBotsCount      = sConfigMgr->GetIntDefault("NpcBot.DesiredWanderingBotsCount", 0);
     _botPvP                         = sConfigMgr->GetBoolDefault("NpcBot.PvP", true);
     _botMovementFoodInterrupt       = sConfigMgr->GetBoolDefault("NpcBot.Movements.InterruptFood", false);
     _displayEquipment               = sConfigMgr->GetBoolDefault("NpcBot.EquipmentDisplay.Enable", true);
@@ -510,6 +516,10 @@ uint32 BotMgr::GetBaseUpdateDelay()
 uint32 BotMgr::GetOwnershipExpireTime()
 {
     return _npcBotOwnerExpireTime;
+}
+uint32 BotMgr::GetDesiredWanderingBotsCount()
+{
+    return _desiredWanderingBotsCount;
 }
 float BotMgr::GetBotStatLimitDodge()
 {
@@ -1924,3 +1934,7 @@ float BotMgr::GetBotDamageModByClass(uint8 botclass)
             return 1.0;
     }
 }
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif

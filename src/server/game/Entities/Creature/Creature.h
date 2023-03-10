@@ -404,16 +404,23 @@ public:
 
     void ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds duration);
 
+    /**
+     * @brief Helper to resume chasing current victim.
+     *
+     * */
+    void ResumeChasingVictim() { GetMotionMaster()->MoveChase(GetVictim()); };
+
     std::string GetDebugInfo() const override;
 
     //NPCBots
-    bool LoadBotCreatureFromDB(uint32 guid, Map* map, bool addToMap = true);
+    bool LoadBotCreatureFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true, bool generated = false, uint32 entry = 0, Position* pos = nullptr);
     Player* GetBotOwner() const;
     Unit* GetBotsPet() const;
     bool IsNPCBot() const override;
     bool IsNPCBotPet() const override;
     bool IsNPCBotOrPet() const override;
     bool IsFreeBot() const;
+        bool IsWandererBot() const;
     uint8 GetBotClass() const;
     uint32 GetBotRoles() const;
     bot_ai* GetBotAI() const { return bot_AI; }

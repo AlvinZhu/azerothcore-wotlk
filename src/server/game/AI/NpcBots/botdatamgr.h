@@ -9,6 +9,12 @@
 
 class Creature;
 
+struct EquipmentInfo;
+struct CreatureTemplate;
+struct Position;
+
+enum LocaleConstant;
+
 enum NpcBotDataUpdateType
 {
     NPCBOT_UPDATE_OWNER                 = 1,
@@ -150,6 +156,18 @@ class BotDataMgr
         static ObjectGuid GetNPCBotGuid(uint32 entry);
         static std::vector<uint32> GetExistingNPCBotIds();
         static uint8 GetOwnedBotsCount(ObjectGuid owner_guid, uint32 class_mask = 0);
+
+        static void GenerateWanderingBots();
+        static CreatureTemplate const* GetBotExtraCreatureTemplate(uint32 entry);
+        static EquipmentInfo const* GetBotEquipmentInfo(uint32 entry);
+
+        static uint8 GetLevelBonusForBotRank(uint32 rank);
+        static uint8 GetMaxLevelForMapId(uint32 mapId);
+        static uint8 GetMinLevelForBotClass(uint8 m_class);
+        static std::pair<uint8, uint8> GetZoneLevels(uint32 zoneId);
+        static std::pair<uint32 /*nodeId*/, Position const*> GetWanderMapNode(uint32 mapId, uint32 curNodeId, uint32 lastNodeId, uint8 lvl);
+        static Position const* GetWanderMapNodePosition(uint32 mapId, uint32 nodeId);
+        static std::string GetWanderMapNodeName(uint32 mapId, uint32 nodeId);
 
         static std::shared_mutex* GetLock();
 
